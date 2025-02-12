@@ -1,24 +1,23 @@
-import { MeshProps, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import { Mesh } from "three";
+import { useMemo } from "react";
+import { BufferGeometry, Float32BufferAttribute } from "three";
+import { MeshProps } from "@react-three/fiber";
 
-const Box = (props: MeshProps) => {
-    const meshRef = useRef<Mesh>(null!);
+interface BoxProps extends MeshProps {
+    vertices: number[];
+}
 
-    // Анимация вращения
-    useFrame(() => {
-        if (meshRef.current) {
-            meshRef.current.rotation.x += 0.01;
-            meshRef.current.rotation.y += 0.01;
-        }
-    });
+export default function Box({ vertices, ...props }: BoxProps) {
+    const geometry = useMemo(() => {
+        if (vertices.length === 0) return new BufferGeometry();
+
+        const geo = new BufferGeometry();
+        geo.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+        return geo;
+    }, [vertices]);
 
     return (
-        <mesh ref={meshRef} {...props}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="orange" />
+        <mesh {...props} geometry={geometry}>
+            <meshStandardMaterial color="orange" wireframe={true} />
         </mesh>
     );
-};
-
-export default Box;
+}

@@ -1,21 +1,25 @@
+import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import Box from "./Box";
 
-const Scene = () => {
+export default function Scene({ size }) {
+    const [vertices, setVertices] = useState<number[]>([]);
+
+    useEffect(() => {
+        fetch("/api/triangulateBox", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(size),
+        })
+            .then((res) => res.json())
+            .then((data) => setVertices(data.vertices));
+    }, [size]);
+
     return (
-        <Canvas camera={{ position: [3, 3, 3] }}>
-    {/* Освещение */}
-    <ambientLight intensity={0.5} />
-    <directionalLight position={[5, 5, 5]} intensity={1} />
-
-    {/* 3D Куб */}
-    <Box />
-
-    {/* Контролы камеры */}
-    <OrbitControls />
-    </Canvas>
-);
-};
-
-export default Scene;
+        <Canvas>
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[5, 5, 5]} intensity={1} />
+            {vertices.length > 0 && <Box vertices={vertices} />}
+        </Canvas>
+    );
+}
