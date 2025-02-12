@@ -6,6 +6,12 @@
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["@react-three/fiber"]
+    "types": ["@react-three/fiber"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true
   }
 }

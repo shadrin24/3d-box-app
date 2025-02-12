@@ -12,13 +12,20 @@ export default function Scene({ size }: { size: Size }) {
     const [vertices, setVertices] = useState<number[]>([]);
 
     useEffect(() => {
-        fetch("/api/triangulateBox", {
+        const apiUrl = import.meta.env.VITE_API_URL || "https://3d-box-app.vercel.app"; // Автоматически меняет сервер
+        console.log("API URL:", apiUrl);
+        console.log("Sending request with size:", size);
+
+        fetch(`${apiUrl}/api/triangulateBox`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(size),
         })
             .then((res) => res.json())
-            .then((data) => setVertices(data.vertices));
+            .then((data) => {
+                console.log("Vertices received:", data.vertices); // ЛОГ ДАННЫХ
+                setVertices(data.vertices);
+            });
     }, [size]);
 
     return (
