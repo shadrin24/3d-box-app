@@ -10,7 +10,7 @@ const BoxForm = ({ onSizeChange }: BoxFormProps) => {
     const [width, setWidth] = useState(1);
     const [height, setHeight] = useState(1);
     const [depth, setDepth] = useState(1);
-    const { darkMode, toggleTheme } = useTheme();
+    const { darkMode } = useTheme();
 
     const handleSubmit = () => {
         onSizeChange(width, height, depth);
