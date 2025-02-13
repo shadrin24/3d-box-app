@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { BufferGeometry, Float32BufferAttribute } from "three";
+import {
+    BufferGeometry,
+    Float32BufferAttribute,
+    WireframeGeometry,
+} from "three";
 import { MeshProps } from "@react-three/fiber";
 
 interface BoxProps extends MeshProps {
@@ -16,8 +20,23 @@ export default function Box({ vertices, ...props }: BoxProps) {
     }, [vertices]);
 
     return (
-        <mesh {...props} geometry={geometry}>
-            <meshStandardMaterial color="orange" wireframe={true} />
-        </mesh>
+        <>
+            {/* Основной залитый куб */}
+            <mesh {...props} geometry={geometry}>
+                <meshStandardMaterial
+                    color="lightgrey"
+                    flatShading={true}
+                    // side={1} // THREE.FrontSide
+                    // depthTest={true}
+                    // depthWrite={true}
+                    // polygonOffsetFactor={-1} // Уменьшает глубину сетки, чтобы она была поверх куба
+                />
+            </mesh>
+
+            {/* Видимая сетка треугольников */}
+            <lineSegments geometry={new WireframeGeometry(geometry)}>
+                <lineBasicMaterial color="black" depthTest={true} />
+            </lineSegments>
+        </>
     );
 }

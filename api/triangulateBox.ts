@@ -10,34 +10,20 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(204).send("");
     }
 
-    const { width, height, depth, angleX = 30, angleY = 45 } = req.body; // Углы поворота
+    const { width, height, depth } = req.body;
 
     if (!width || !height || !depth) {
         return res.status(400).json({ error: "Missing parameters" });
     }
 
-    // Переводим углы в радианы
-    const radX = (angleX * Math.PI) / 180;
-    const radY = (angleY * Math.PI) / 180;
+    // Изометрическая матрица проекции
+    const isoMatrix = [
+        [Math.sqrt(3) / 2, 0, -Math.sqrt(3) / 2], // X' = x * cos(30°) - z * cos(30°)
+        [0.5, 1, 0.5], // Y' = x * sin(30°) + y - z * sin(30°)
+        [0, 0, 0] // Z не используем для 2D-проекции
+    ];
 
-    const cosX = Math.cos(radX);
-    const sinX = Math.sin(radX);
-    const cosY = Math.cos(radY);
-    const sinY = Math.sin(radY);
-
-    // Функция поворота вокруг Y
-    const rotateY = (x: number, z: number) => ({
-        x: x * cosY - z * sinY,
-        z: x * sinY + z * cosY,
-    });
-
-    // Функция поворота вокруг X
-    const rotateX = (y: number, z: number) => ({
-        y: y * cosX - z * sinX,
-        z: y * sinX + z * cosX,
-    });
-
-    // Вершины куба (до поворота)
+    // Вершины куба (до проекции)
     const vertices = [
         [0, 0, 0], [width, 0, 0], [width, height, 0],
         [0, 0, 0], [width, height, 0], [0, height, 0],
@@ -55,28 +41,28 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
         [width, 0, 0], [width, height, depth], [width, 0, depth],
 
         [0, 0, 0], [0, height, 0], [0, height, depth],
-        [0, 0, 0], [0, height, depth], [0, 0, depth],
+        [0, 0, 0], [0, height, depth], [0, 0, depth]
     ];
 
-    // Применяем повороты к каждой вершине
-    const rotatedVertices = vertices.map(([x, y, z]) => {
-        // Центрируем перед вращением
-        let centeredX = x - width / 2;
-        let centeredY = y - height / 2;
-        let centeredZ = z - depth / 2;
+    // Центрируем куб перед проекцией
+    const cx = width / 2;
+    const cy = height / 2;
+    const cz = depth / 2;
 
-        // Поворот вокруг Y
-        const { x: rotatedX, z: rotatedZ_Y } = rotateY(centeredX, centeredZ);
+    const transformedVertices = vertices.map(([x, y, z]) => {
+        const xRel = x - cx;
+        const yRel = y - cy;
+        const zRel = z - cz;
 
-        // Поворот вокруг X
-        const { y: rotatedY, z: rotatedZ_X } = rotateX(centeredY, rotatedZ_Y);
+        // Изометрическая проекция
+        const xProj = xRel * isoMatrix[0][0] + zRel * isoMatrix[0][2];
+        const yProj = xRel * isoMatrix[1][0] + yRel * isoMatrix[1][1] + zRel * isoMatrix[1][2];
 
-        // Возвращаем обратно
-        return [rotatedX + width / 2, rotatedY + height / 2, rotatedZ_X + depth / 2];
+        return [xProj, yProj, 0]; // Z можно занулить
     });
 
-    // Делаем плоский массив
-    const flattenedVertices = rotatedVertices.flat();
+    // Преобразуем в одномерный массив
+    const flattenedVertices = transformedVertices.flat();
 
     res.json({ vertices: flattenedVertices });
 }
