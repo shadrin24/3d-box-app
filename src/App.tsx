@@ -15,18 +15,19 @@ function AppContent() {
                 alignItems: "center",
                 height: "100vh",
                 background: darkMode ? "#333" : "#fff",
-                color: darkMode ? "#fff" : "#000",
+                // color: darkMode ? "#fff" : "#000",
+                width: "100vw",
             }}
         >
             {/* Контейнер для формы и сцены */}
-            <div style={{ display: "flex", width: "80%", maxWidth: "1200px" }}>
+            <div style={{ display: "flex", width: "80%", maxWidth: "100%", alignItems: "center" }}>
                 {/* Форма (слева, по центру) */}
                 <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <BoxForm onSizeChange={(width, height, depth) => setSize({ width, height, depth })} />
                 </div>
 
                 {/* Сцена (справа, по центру) */}
-                <div style={{ flex: 2, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div style={{ flex: 2, display: "flex", width: "100%", height: "90vh"}}>
                     <Scene size={size} />
                 </div>
             </div>

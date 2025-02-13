@@ -29,7 +29,7 @@ export default function Scene({ size }: { size: Size }) {
     }, [size]);
 
     return (
-        <Canvas>
+        <Canvas style={{ width: "100%", height: "100%" }}>
             <ambientLight intensity={0.5} />
             <directionalLight position={[5, 5, 5]} intensity={1} />
             {vertices.length > 0 && <Box vertices={vertices} />}

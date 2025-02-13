@@ -1,5 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import {useTheme} from "../ThemeContext";
 
 interface BoxFormProps {
     onSizeChange: (width: number, height: number, depth: number) => void;
@@ -9,6 +10,7 @@ const BoxForm = ({ onSizeChange }: BoxFormProps) => {
     const [width, setWidth] = useState(1);
     const [height, setHeight] = useState(1);
     const [depth, setDepth] = useState(1);
+    const { darkMode, toggleTheme } = useTheme();
 
     const handleSubmit = () => {
         onSizeChange(width, height, depth);
@@ -25,6 +27,8 @@ const BoxForm = ({ onSizeChange }: BoxFormProps) => {
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+
+                bgcolor: darkMode ? "#9b9b9b" : "#fff"
             }}
         >
             <Typography variant="h6">Настройки куба</Typography>
